@@ -24,13 +24,31 @@ class SqlConnection (object):
         cols = cols + " " + str(col[0]) + " " + str(col[1]);
         
         # Execute query
-        self.cursor.execute('CREATE TABLE ' + tableName + ' ( ' + cols + ' )');
+        self.cursor.execute('CREATE TABLE IF NOT EXISTS ' + tableName + ' ( ' + cols + ' )');
         
-    def deleteTable(self):
-        pass;
+    def deleteTable(self, table):
+        query = "DROP TABLE IF EXISTS " + table;
+        self.cursor.execute(query);
         
-    def selectData(self, table, columns):
-        pass;
+    def selectData(self, table, columns, condition=None):
+        query = "SELECT FROM " + table + " ";
+        
+        for i in range (len(columns)-1):
+            query = query + "";
+        
+        if (condition != None):
+            query = query + " WHERE " + condition;
+        
+        # Send query
+        self.cursor.execute(query);
+        
+        # Get data in array form
+        data = self.cursor.fetchall();
+        
+        # Return the resulting data as an array
+        return data;
+        
+            
     
     def insertData(self, table, data):
         # Create query from data
@@ -53,19 +71,50 @@ class SqlConnection (object):
     
     # Insert a blob of binary data into a table.
     def insertContent(self, table, content):
-        
         pass;
         
-    def updateData(self, data):
-        pass;
+    def selectContent(self, table, contentID):
+        query = "SELECT ID, content, type, category FROM " + table + " WHERE id = " + str(contentID);
+        self.cursor.execute(query);
+        #contentID, content, contentType, category = self.cursor.fetchone();
+        
+        return self.cursor.fetchone();
+
+#        filename = "test.wav";
+#        
+#        # write the data to a tempfile
+#        new_file, fname = tempfile.mkdtemp();
+#        print (fname);
+#        os.write(new_file, content);
+#        
+#        with open(filename, 'wb') as output_file:
+#            output_file.write(content);
+#        return filename;
+        
+    def updateData(self, table, data, condition=None):
+        # Create query from data
+        query = "UPDATE " + table + " SET ";
+        for i in range (len(data)-1):
+            query = query + " " + data[0] + " = " + str(data[1]) + ",";
+        query = query + " " + data[0] + " = " + str(data[1]);
+        
+        # Add condition
+        if (condition == None):
+            query = query + " WHERE " + condition;
+            
+        # Send query
+        self.cursor.execute(query);
+        self.conn.commit();
         
     def closeConnection(self):
         self.conn.close();
         
     
-# MAIN CODE #
-try:
-    s = SqlConnection("sqlTesfdsfsst.db");
-    #s.insertData("table", )
-except FileExistsError as error:
-    print (repr(error));
+## MAIN CODE #
+#try:
+#    s = SqlConnection("main.db");
+#    s.selectContent("main", 1);
+#    s.closeConnection();
+#    
+#except FileExistsError as error:
+#    print (repr(error));
