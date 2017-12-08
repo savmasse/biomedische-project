@@ -7,6 +7,8 @@ from mainwindow import Ui_MainWindow
 sys.path.append("../src/");
 from sqlConnection import SqlConnection
 from scipy.io import wavfile
+from questionServer import QuestionServer
+from trainingToolLogic import TTL
 
 # Start up the application
 app = QApplication(sys.argv);
@@ -42,11 +44,18 @@ def onClick (checked):
     # Show the plot !
     imgServer.plot(dataX, dataY);
     
-    print ("Done");
+    # Get a question
+    q = QuestionServer(1, "../data/main.db", "questions");
+    q.fetchRandomQuestions();
+    data = q.getQuestionList();
+    ui.leditAnswer.setText(data[0][3]);
     
 # Handle active UI components
+
+TTL.connect("../data/main.db");
+TTL.init();
 btn = ui.btnSubmit;
-btn.clicked.connect(onClick);
+btn.clicked.connect(TTL.nextQuestion);
 imgServer = ui.graphicsView;
 
 # Execute

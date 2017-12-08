@@ -12,7 +12,7 @@ class SqlConnection (object):
             self.conn = sqlite3.connect(dbName);
             self.cursor = self.conn.cursor();
         else:
-            raise FileExistsError("Could not find the database file");
+            raise Exception ("Failed to connect to the database.");
         
     def createTable(self, tableName, columns):
         cols = "";
@@ -48,7 +48,6 @@ class SqlConnection (object):
         # Return the resulting data as an array
         return data;
         
-            
     
     def insertData(self, table, data):
         # Create query from data
@@ -73,23 +72,17 @@ class SqlConnection (object):
     def insertContent(self, table, content):
         pass;
         
+    def executeSelectQuery (self, query):
+        return self.cursor.execute(query);
+        
+#        return self.cursor.fetchall;
+                
     def selectContent(self, table, contentID):
         query = "SELECT ID, content, type, category FROM " + table + " WHERE id = " + str(contentID);
         self.cursor.execute(query);
         #contentID, content, contentType, category = self.cursor.fetchone();
         
         return self.cursor.fetchone();
-
-#        filename = "test.wav";
-#        
-#        # write the data to a tempfile
-#        new_file, fname = tempfile.mkdtemp();
-#        print (fname);
-#        os.write(new_file, content);
-#        
-#        with open(filename, 'wb') as output_file:
-#            output_file.write(content);
-#        return filename;
         
     def updateData(self, table, data, condition=None):
         # Create query from data
@@ -116,5 +109,5 @@ class SqlConnection (object):
 #    s.selectContent("main", 1);
 #    s.closeConnection();
 #    
-#except FileExistsError as error:
+#except Exception as error:
 #    print (repr(error));
