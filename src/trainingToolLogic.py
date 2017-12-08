@@ -118,9 +118,13 @@ class TTL (object): # TTL = Training Tool Logic
         for d in data:
             print (d[0])
             
+    @staticmethod
     def getContentTypeCount (contentType):
-        query = "SELECT count(*) from 
-       
+        query = "SELECT count(*) from " + TTL.DB_TABLE_MAIN + " where type = '" + contentType + "'";
+        data = TTL.sql.executeSelectQuery(query);
+        for d in data:
+            print (d[0])
+            
 ## Main
 #
 #TTL.connect("../data/main.db");
