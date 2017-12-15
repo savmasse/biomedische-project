@@ -1,75 +1,44 @@
 from sqlConnection import SqlConnection
-from questionServer import QuestionServer
+from contentServer import ContentServer
 
 """
-Contains the logic for the training tool; this class allows full
+Contains the logic for the training tool; this class allows for full
 logic seperation from the UI components of the application.
 """
 class TTL (object): # TTL = Training Tool Logic
     
     # Static properties
     sql = None
-    questions = None
-    currentQuestion = None
-    questionIter = None # iterate through questions
     score = 0;
     DB_TABLE_MAIN = 'main'
     DB_TABLE_QUESTIONS = 'questions'
+    contentServer = None
     
     @staticmethod
     def init ():
-        TTL.fetchQuestions();
-        TTL.questionIter = iter(TTL.questions);
-    
+        TTL.contentServer = ContentServer(TTL.sql, TTL.DB_TABLE_MAIN)
+        
     @staticmethod
     def submit ():
-        """
-        Handle the clicking of the submit button.
-        """
-        print ("Submit clicked");
-        
-        # Check if correct answer
-        
-        # Go to the next question if not the last
-        
-        # If last question, show score
+        """ Handle submitting of an answer """
+        TTL.contentServer.fetchContent(1)
         
     @staticmethod
     def setMainTable (table):
-        super.DB_TABLE_MAIN = table;
+        """ Set content table """
+        TTL.DB_TABLE_MAIN = table;
         
     @staticmethod
-    def nextQuestion():
-        """
-        Serve the next question to the user.
-        """
-        TTL.currentQuestion = next(TTL.questionIter);
-        
-        
-    @staticmethod
-    def getCurrentQuestion ():
-        return TTL.currentQuestion;
-        
-    @staticmethod
-    def isCorrectAnswer(submittedAnswer, correctAnswer):
-        """
-        Check if the submitted answer is the correct one.
-        """
-        return submittedAnswer == correctAnswer;
-        
-    @staticmethod
-    def fetchQuestions():
-        q = QuestionServer(4, TTL.sql, TTL.DB_TABLE_QUESTIONS);
-        q.fetchRandomQuestions();
-        TTL.questions = q.getQuestionList();
-        TTL.currentQuestion = TTL.questions[0];
+    def setQuestionsTable (table):
+        """ Set questions table """
+        TTL.DB_TABLE_QUESTIONS = table
         
     @staticmethod
     def connect (dbName):
         """
         Connect to the database.
         """
-        TTL.sql = SqlConnection(dbName);
+        TTL.sql = SqlConnection(dbName)
         
     @staticmethod    
     def closeConnection():
@@ -77,18 +46,6 @@ class TTL (object): # TTL = Training Tool Logic
         Close the database connection.
         """
         TTL.sql.closeConnection();
-        
-    @staticmethod
-    def fetchContent ():
-        """
-        Fetch the content that belongs to the question from the main table
-        """
-        # Get the contentID from the question
-        contentID = TTL.currentQuestion[1];
-        
-        # Fetch data
-        content = TTL.sql.selectContent(TTL.DB_TABLE_MAIN, contentID);
-        return content[1];
     
     @staticmethod
     def getQuestionCount ():
@@ -102,7 +59,6 @@ class TTL (object): # TTL = Training Tool Logic
        """
        How many elements are there of a certain type of question?
        """
-       
        query = "SELECT count(*) from " + TTL.DB_TABLE_QUESTIONS + " where type = '" + questionType + "'";
        data = TTL.sql.executeSelectQuery(query);
        for d in data:

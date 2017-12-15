@@ -3,7 +3,6 @@ Handle database connection here.
 """
 import sqlite3
 import os.path
-from os import listdir, getcwd
 
 class SqlConnection (object):
     
@@ -68,7 +67,7 @@ class SqlConnection (object):
         self.conn.commit();
         
     
-    # Insert a blob of binary data into a table.
+    # TODO : Insert a blob of binary data into a table.
     def insertContent(self, table, content):
         pass;
         

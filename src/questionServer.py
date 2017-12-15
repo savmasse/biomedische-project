@@ -1,61 +1,37 @@
-import numpy as np
-from sqlConnection import SqlConnection
+# TTL will be imported by the time this is called
+from question import Question
 
 class QuestionServer (object):
     
-    def __init__(self, questionCount, sqlConnection, dbTable):
-        self.questionCount = questionCount;
+    def __init__(self, sqlConnection, dbTable):
+#        self.questionCount = questionCount;
         self.sqlConnection = sqlConnection;
         self.dbTable = dbTable;
         self.questionList = [];
-        self.sql = 0;
         
-    def fetchRandomQuestions (self):
-        # Clear the previous list of questions
-        self.questionList = []
-        
-        # Get a random list of questions from the specified type
-        query = "SELECT * from " + self.dbTable + " order by RANDOM() limit " + str(self.questionCount);
+    def convertQuestions (self, questionTuples):
+        for questionTuple in questionTuples:
+            self.questionList.append( Question(questionTuple) )
+            
+    def fetchQuestions (self, contentID):
+        """ 
+        Fetch all questions attached to a contentID and add them to the list.
+        """
+        # Create query and get data
+        query = "SELECT * from " + self.dbTable + " where main_ID = '" + str(contentID) + "'";
         data = self.sqlConnection.executeSelectQuery(query);
         
-        # Put the questions in the list
-        for d in data:
-            self.questionList.append(d);
+        # Convert the data into Question objects
+        self.convertQuestions(data)
         
     def getQuestionList (self):
         return self.questionList;
     
-    """
-    Some methods to request parts of the data from a question.
-    """
-    @staticmethod
-    def getQuestionID (question):
-        return question[0];
-    
-    @staticmethod
-    def getQuestionContentID (question):
-        return question[1];
-    
-    @staticmethod
-    def getQuestionType (question):
-        return question[2];
-        
-    @staticmethod
-    def getQuestionText (question):
-        return question[3];
-    
-    @staticmethod
-    def getQuestionChoices(question):
-        return question[4];
-    
-    @staticmethod
-    def getQuestionAnswers(question):
-        return question[5];
     
 ## Main code
 #q = QuestionServer(4, "../data/main.db", "questions");
 #q.fetchRandomQuestions();
 #data = q.getQuestionList();
 #for d in data:
-#    print d[2]
+#    print (d[2])
 #q.closeQuestionConnection();
